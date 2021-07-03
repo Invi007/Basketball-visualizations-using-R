@@ -1,0 +1,311 @@
+```{r}
+install.packages("plotrix")
+install.packages("ggplot2")
+install.packages("ggforce")
+install.packages("dplyr")
+library(plotrix)
+library(ggplot2)
+library(ggforce)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(hexbin)
+library(tidyverse)
+library(ggthemes)
+```
+
+
+```{r}
+
+lakers_0809 <-read.csv("lakers.csv",header = T) %>%
+filter(team == 'LAL')
+
+
+
+# Basketball half court
+Basketball_Court <- ggplot(xlim=c(0,50), ylim=c(0,47)) +
+xlab("End Line") +
+ylab("Side Line") +
+  
+#Basketball half court dimensions
+geom_segment(mapping = aes(x = 0, y = 0, xend = 0, yend = 47), lwd = 1)+
+geom_segment(mapping = aes(x = 0, y = 47, xend = 50, yend = 47), lwd = 1) +
+geom_segment(mapping = aes(x = 50, y = 47, xend = 50, yend = 0), lwd = 1) +
+geom_segment(mapping = aes(x = 50, y = 0, xend = 0, yend = 0), lwd = 1)+ 
+  
+  
+#Basketball half court line
+geom_segment(mapping = aes(x = 0, y = 47, xend = 50, yend = 47), lwd = 1)+
+  
+# Basketball (NBA) Line curve for three pointer
+geom_segment(aes(x = 3, xend = 3, y = 0, yend = 14)) +
+geom_curve(mapping = aes(x = 3, y = 14, xend = 25, yend = 29), curvature = -0.38, lwd = 0.5)+ 
+geom_segment(mapping = aes(x = 25, y = 29, xend = 25, yend = 29), lwd = 0.5) +
+geom_curve(mapping = aes(x = 25, y = 29, xend = 47, yend = 14), curvature = -0.38, lwd = 0.5)+
+geom_segment(aes(x = 47, xend = 47, y = 0, yend = 14))+
+geom_segment(mapping = aes(x = 19, y = 0, xend = 19, yend = 19), lwd = 0.5) +
+geom_segment(mapping = aes(x = 31, y = 0, xend = 31, yend = 19), lwd = 0.5) +
+  
+# Basketball Center circle
+geom_circle(aes(x0= 25, y0 = 47, r = 6),color="black", inherit.aes= FALSE)+
+  
+# Basketball restraining circle 
+geom_circle(aes(x0= 25, y0 = 47, r = 2), fill= "black")+
+  
+# Basketball court free throw circle
+geom_curve(mapping = aes(x = 25, y = 25, xend = 31, yend = 19), curvature = -0.4, lwd = 2) +
+geom_curve(mapping = aes(x = 25, y = 25, xend = 19, yend = 19), curvature = 0.4, lwd = 2)+
+  
+# Basketball court shaded line 
+geom_circle(aes(x0= 25, y0 = 19, r = 6), linetype= 2, color = "black", lwd=0.5) +
+
+#Basketball Lane boundaries
+geom_segment(mapping = aes(x = 17, y = 19, xend = 17, yend = 0), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 33, y = 19, xend = 17, yend = 19),color="black", lwd = 1)+
+geom_segment(mapping = aes(x = 33, y = 0, xend = 33, yend = 19),color= "black", lwd = 1) +
+  
+#Basketball court Markings boundary lane
+geom_segment(mapping = aes(x = 19, y = 0, xend = 19, yend = 19), lwd = 0.5) +
+geom_segment(mapping = aes(x = 31, y = 0, xend = 31, yend = 19), lwd = 0.5) +
+geom_segment(mapping = aes(x = 34, y = 7, xend = 33, yend = 7), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 34, y = 8, xend = 33, yend = 8), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 34, y = 11, xend = 33, yend = 11), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 34, y = 14, xend = 33, yend = 14), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 16, y = 7, xend = 17, yend = 7), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 16, y = 8, xend = 17, yend = 8), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 16, y = 11, xend = 17, yend = 11), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 16, y = 14, xend = 17, yend = 14), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 32, y = 11, xend = 31, yend = 11), color="black", lwd = 1)+
+geom_segment(mapping = aes(x = 32, y = 14, xend = 31, yend = 14), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 32, y = 17, xend = 31, yend = 17), color="black", lwd = 1) +   
+geom_segment(mapping = aes(x = 18, y = 11, xend = 19, yend = 11), color="black", lwd = 1) +
+geom_segment(mapping = aes(x = 18, y = 14, xend = 19, yend = 14), color="black", lwd = 1)+
+geom_segment(mapping = aes(x = 18, y = 17, xend = 19, yend = 17), color="black", lwd = 1)+  
+# Basketball 4 feet radius 
+  
+geom_curve(mapping = aes(x = 25, y = 8, xend = 29, yend = 4), curvature = -0.4,color= "black", lwd = 1) +
+  
+geom_curve(mapping = aes(x = 25, y = 8, xend = 21, yend = 4), curvature = 0.4, color= "black", lwd = 1)+
+  
+
+#Backboard
+geom_segment(mapping = aes(x = 22, y = 4, xend = 28, yend = 4), lwd = 1)+
+  
+#Basket with radius 0.75ft or 9 inches
+geom_circle(aes(x0= 25, y0 = 5.25, r = 0.75), color="black", lwd = 1)+
+ggtitle("Basketball Half Court")+
+coord_fixed()
+theme_classic()
+plot(Basketball_Court)
+
+#Creating data frames for 1,2,3 pointers
+one_pointers <- filter(lakers_0809,lakers_0809$points == 1, na.rm= TRUE)
+two_pointers <- filter(lakers_0809,lakers_0809$points == 2, na.rm= TRUE)
+three_pointers <- filter(lakers_0809,lakers_0809$points == 3, na.rm= TRUE)
+
+
+
+# Plotting 2 and 3 pointers
+Basketball_Court +
+    geom_point(data = two_pointers, aes(x= x , y= y, color = game_type), alpha = 0.8)+
+    coord_equal(ratio = 1)+
+    scale_colour_manual(values = c("home" = "red", "away"="cyan"))+
+    ggtitle("Shot Locations - 2 pointer")+
+    theme_classic()
+
+Basketball_Court +
+    geom_point(data = three_pointers, aes(x= x , y= y, color = game_type), alpha = 0.8)+
+    coord_equal(ratio = 1)+
+    scale_colour_manual(values = c("home" = "red", "away"="cyan"))+
+    ggtitle("Shot Locations - 3 pointer")+
+    theme_classic()
+
+
+# Creating a dataframe for all the shots taken by lakers
+Strikers_shots <- lakers_0809 %>%
+  filter(result == 'made' | result == 'missed') %>%
+  select(player,result,type,points,x,y,game_type,opponent)
+
+
+
+# Creating a dataframe for shots made
+Strikers <- lakers_0809 %>%
+  filter(result == 'made') %>%
+  select(player,result,type,points,x,y,game_type,opponent,period)
+
+
+
+# Lakers points scored
+Home_away <- ggplot(data = Strikers_shots, aes(x = points, y = game_type))+
+  geom_bar(stat="identity", fill="steelblue")+
+  facet_wrap(~player)+
+  theme_minimal()+
+  ggtitle("Points scored by each player")
+Home_away  
+
+
+
+# Arranging shot types
+Top_shotsmade <- Strikers %>% count(type) %>% arrange(-n)
+Top_shotsmade = Top_shotsmade[-1,]
+
+# Top 12 Shots made
+Top_12 <- Strikers %>% filter(type == 'jump'|type == '3pt'|type == 'layup'|type == 'driving layup'|type == 'slam dunk'|type == 'dunk'|type == 'turnaround jump'|type == 'hook'|type == 'tip'|type == 'pullup jump'|type == 'alley oop dunk'|type == 'driving dunk')
+
+#plotting top 12 shots made
+Basketball_Court + 
+  geom_jitter(data = Top_12, aes(x=x,y=y, color = type, alpha = 0.6)) +
+  coord_equal()
+
+#Player positions while scoring
+Basketball_Court + 
+    geom_hex(data = Strikers,
+             bins = 20, 
+             aes(x = x, y = y),
+             alpha = 0.7
+             ) + 
+    scale_fill_gradient(low = "coral", high = "darkred") +
+    coord_equal()
+
+# #Heatmap Function from all shots taken by Lakers
+heatmap_total <- function(name)
+{
+  plot <- Basketball_Court + stat_density2d(data = subset(Strikers_shots, player == name),
+                                 aes(x=x, y=y, alpha= 0.6,
+                                     fill = ..level..), geom = "polygon")+
+    scale_fill_gradient(low = "coral", high = "Red")+
+    coord_equal()+
+    ggtitle('Heatmap for Lakers total shots')+
+    guides(fill=F)+
+    return(plot)
+}
+heatmap_total('Kobe Bryant')
+heatmap_total('Lamar Odom')
+heatmap_total('Pau Gasol')
+
+
+
+#Heatmap Function from all shots made by Lakers
+heatmap_player <- function(name)
+{
+  plot <- Basketball_Court + stat_density2d(data = subset(Strikers, player == name),
+                                 aes(x=x, y=y, alpha= 0.6,
+                                     fill = ..level..), geom = "polygon")+
+    scale_fill_gradient(low = "coral", high = "Red")+
+    coord_equal()+
+    ggtitle('Heatmap for Lakers total shots made')+
+    guides(fill=F)
+    return(plot)
+}
+heatmap_player('Kobe Bryant')
+#heatmap_player('Lamar Odom')
+heatmap_player('Pau Gasol')
+
+
+# Arranging the shot types that are most effective for each player
+# Removing empty rows
+Kobe_types <- Strikers %>%  filter(Strikers$player == 'Kobe Bryant') %>% count(type) %>% arrange(-n)
+Kobe_types = Kobe_types[-1,]
+
+
+Pau_types<-Strikers %>%  filter(Strikers$player == 'Pau Gasol') %>% count(type) %>% arrange(-n)
+Pau_types = Pau_types[-1,]
+
+Lamar_types <- Strikers %>% filter(Strikers$player == 'Lamar Odom') %>% count(type) %>% arrange(-n)
+Lamar_types=Lamar_types[-1,]
+
+
+#Player effectiveness
+#Dataframe for basket made 
+Basket_made <- Strikers %>%
+  filter(points == 3,player=='Kobe Bryant'|player=='Pau Gasol'|player=='Lamar Odom')%>%
+  group_by(player)%>%
+  tally()
+#Basket_made<- Basket_made %>%
+  
+
+#Dataframe for basket attempted
+
+Basket_atempted <- Strikers_shots %>%
+  filter(type=='3pt',player=='Kobe Bryant'|player=='Pau Gasol'|player=='Lamar Odom')%>%
+    group_by(player)%>%
+    tally()
+#Removing the player who attempted but didn't score
+#Basket_atempted = Basket_atempted[-14,]
+
+#Combining both dataframs using column bind
+Combined_basket<- bind_cols(Basket_atempted, Basket_made)
+#FGM/FGA
+Combined_basket$Effectiveness = Combined_basket$n...4/Combined_basket$n...2
+Combined_basket$Effectiveness <- with(Combined_basket, Effectiveness*100)
+
+
+#Remaninng the columns  
+names(Combined_basket)[1] <- "Player"
+names(Combined_basket)[2] <- "Baskets Attempted"
+names(Combined_basket)[3] <- "Player1"
+names(Combined_basket)[4] <- "Baskets Scored"
+#Dropping second playername column
+Effective_df = subset(Combined_basket, select = -c(Player1) )
+names(Combined_basket)[4] <- "Effectiveness(%)"
+
+
+#Plotting player effectiveness
+Effectiveness_graph<-ggplot(data=Effective_df, aes(x=Player, y=Effectiveness)) +
+  geom_bar(stat="identity", fill="steelblue")+
+  geom_text(aes(label=Effectiveness), color="Black")+
+  theme_minimal()
+#Effectiveness_graph
+Effectiveness_graph + coord_flip()
+
+#s_graph <- ggplot (Combined_basket, aes( reorder(Player, -Basket_made), Basket_made))+ geom_bar #(stat = "identity", aes (fill = Effectiveness))+
+ # theme_classic()
+#s_graph
+
+
+
+
+# Total points
+Total_points <- Strikers %>%
+    group_by(player)%>% 
+    tally((points==1)*1+(points==2)*2+(points==3)*3)
+one_pointers <- Strikers %>%
+    group_by(player)%>% 
+    tally(points==1)
+two_pointers <- Strikers %>%
+    group_by(player)%>% 
+    tally(points==2)
+
+
+three_pointers <- Strikers %>%
+    group_by(player)%>% 
+    tally(points==3)
+
+Totalpoint_scored<- bind_cols(one_pointers,two_pointers,three_pointers,Total_points)
+Totalpoint_scored = Totalpoint_scored[,-3]
+Totalpoint_scored = Totalpoint_scored[,-4]
+Totalpoint_scored = Totalpoint_scored[,-5]
+
+names(Totalpoint_scored)[1] <- "Player"
+names(Totalpoint_scored)[2] <- "One_Pointer"
+names(Totalpoint_scored)[3] <- "Two_Pointer"
+names(Totalpoint_scored)[4] <- "Three_Pointer"
+names(Totalpoint_scored)[5] <- "Total_Points"
+Totalpoint_scored
+
+Totalpoint_graph<-ggplot(data=Totalpoint_scored, aes(x=Player, y=Total_Points)) +
+  geom_bar(stat="identity", fill="steelblue")+
+  #geom_text(aes(label=Total_Points), vjust=-0.3, size=3.5, color="Blac")+
+  geom_text(aes(label=Total_Points), color="Black")+
+  theme_classic()
+#Totalpoint_graph
+Totalpoint_graph + coord_flip()   
+
+
+
+
+
+
+
+
+```
